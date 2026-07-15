@@ -1132,16 +1132,30 @@ function wireEvents(){
 
   // ---- PDV ----
 const btnPdvBuscar = document.getElementById('pdvBuscar');
-if(btnPdvBuscar) {
+const inputPdv = document.getElementById('pdvCode');
+
+if (btnPdvBuscar) {
   btnPdvBuscar.onclick = () => {
-    const input = document.getElementById('pdvCode').value;
-    const aluno = findStudentByCode(input); // Usa a função que alteramos no passo 1
+    const termo = inputPdv.value; // Pega o texto do input apenas no clique
+    const aluno = findStudentByCode(termo); // Usa aquela função que criamos
     
-    if(aluno) {
-      setState({ pdv: { ...state.pdv, student: aluno, codeInput: aluno.codigo } });
+    if (aluno) {
+      // Atualiza o estado apenas uma vez, após o clique
+      setState({ 
+        pdv: { ...state.pdv, student: aluno, codeInput: aluno.codigo } 
+      });
       toast(`Aluno encontrado: ${aluno.nome}`);
     } else {
       toast('Aluno não encontrado!', true);
+    }
+  };
+}
+
+// Opcional: permitir buscar dando Enter
+if (inputPdv) {
+  inputPdv.onkeypress = (e) => {
+    if (e.key === 'Enter') {
+      btnPdvBuscar.click();
     }
   };
 }
