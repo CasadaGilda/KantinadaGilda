@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kantina Casa da Gilda — Sistema de Cantina Escolar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F6F4;
+  --surface:#FFFFFF;
+  --ink:#152420;
+  --ink-soft:#516059;
+  --ink-faint:#8B9A93;
+  --primary:#1F4D3F;
+  --primary-dark:#123328;
+  --primary-soft:#E4EEE9;
+  --accent:#F0A63A;
+  --accent-dark:#CE8620;
+  --coral:#E15C42;
+  --coral-soft:#FBE6E1;
+  --blue-soft:#E5EEF7;
+  --line:#DEE6E1;
+  --radius:14px;
+  --radius-sm:9px;
+  --font-display:'Fraunces',serif;
+  --font-body:'Manrope',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --shadow:0 1px 2px rgba(21,36,32,.04), 0 8px 24px -12px rgba(21,36,32,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+#app{min-height:100vh;padding-bottom:40px}
+h1,h2,h3,.disp{font-family:var(--font-display);letter-spacing:-.01em}
+.mono{font-family:var(--font-mono)}
+a{color:inherit}
+button{font-family:var(--font-body);cursor:pointer}
+input,select,textarea{font-family:var(--font-body)}
+::selection{background:var(--accent);color:#1c1200}
+
+/* ---------- layout helpers ---------- */
+.container{max-width:1180px;margin:0 auto;padding:0 22px}
+.center-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.pad{padding:22px}
+.row{display:flex;align-items:center}
+.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}.gap20{gap:20px}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.grow{flex:1}
+.muted{color:var(--ink-soft)}
+.faint{color:var(--ink-faint)}
+.small{font-size:12.5px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}.mt24{margin-top:24px}.mt32{margin-top:32px}
+.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb16{margin-bottom:16px}.mb20{margin-bottom:20px}
+
+/* ---------- buttons & inputs ---------- */
+.btn{
+  border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:14.5px;
+  display:inline-flex;align-items:center;gap:8px;transition:.15s transform,.15s box-shadow,.15s opacity;
+  line-height:1.1;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-accent{background:var(--accent);color:#241900}
+.btn-accent:hover{background:var(--accent-dark)}
+.btn-coral{background:var(--coral);color:#fff}
+.btn-ghost{background:transparent;color:var(--primary);border:1.5px solid var(--line)}
+.btn-ghost:hover{border-color:var(--primary)}
+.btn-sm{padding:7px 12px;font-size:13px;border-radius:8px}
+.btn-icon{padding:8px;border-radius:8px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn-block{width:100%;justify-content:center}
+.link-btn{background:none;border:none;color:var(--primary);font-weight:700;text-decoration:underline;padding:0;font-size:inherit}
+
+label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em}
+.field{margin-bottom:14px}
+input[type=text],input[type=password],input[type=number],input[type=date],input[type=email],input[type=search],select,textarea{
+  width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:9px;font-size:14.5px;background:#fff;color:var(--ink);
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:1px;border-color:var(--primary)}
+.hint{font-size:12px;color:var(--ink-faint);margin-top:4px}
+.err{font-size:12.5px;color:var(--coral);margin-top:4px;font-weight:600}
+
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;text-transform:uppercase;letter-spacing:.03em}
+.badge-green{background:var(--primary-soft);color:var(--primary)}
+.badge-amber{background:#FBF0DC;color:var(--accent-dark)}
+.badge-coral{background:var(--coral-soft);color:var(--coral)}
+.badge-blue{background:var(--blue-soft);color:#2A5C8C}
+
+/* ---------- login ---------- */
+.login-wrap{width:100%;max-width:920px;display:grid;grid-template-columns:1fr 1fr;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px -20px rgba(18,51,40,.35)}
+.login-hero{background:linear-gradient(160deg,var(--primary) 0%,var(--primary-dark) 100%);color:#fff;padding:44px 38px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.login-hero:before{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;background:rgba(240,166,58,.18)}
+.login-hero:after{content:"";position:absolute;left:-40px;bottom:-70px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06)}
+.login-logo{font-family:var(--font-display);font-size:28px;font-weight:700;position:relative;z-index:1}
+.login-logo span{color:var(--accent)}
+.login-tag{font-size:15px;line-height:1.55;opacity:.88;margin-top:14px;max-width:280px;position:relative;z-index:1}
+.ticket-mini{position:relative;z-index:1;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.35);border-radius:12px;padding:14px 16px;margin-top:28px}
+.ticket-mini .t-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;opacity:.7}
+.ticket-mini .t-code{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--accent);margin-top:4px}
+.login-form-side{background:#fff;padding:44px 38px;display:flex;flex-direction:column;justify-content:center}
+.tabbar{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:22px}
+.tabbar button{flex:1;border:none;background:transparent;padding:9px;border-radius:7px;font-weight:700;font-size:13.5px;color:var(--ink-soft)}
+.tabbar button.active{background:#fff;color:var(--primary);box-shadow:var(--shadow)}
+
+/* ---------- app shell ---------- */
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+.topbar-inner{max-width:1180px;margin:0 auto;padding:0 22px;height:62px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--primary);display:flex;align-items:center;gap:8px}
+.brand span{color:var(--accent-dark)}
+.nav{display:flex;gap:2px}
+.nav button{background:transparent;border:none;padding:9px 13px;border-radius:8px;font-weight:700;font-size:13.5px;color:var(--ink-soft)}
+.nav button.active{background:var(--primary-soft);color:var(--primary)}
+.nav button:hover{color:var(--primary)}
+.userchip{display:flex;align-items:center;gap:10px;font-size:13px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#241900;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.page{max-width:1180px;margin:0 auto;padding:26px 22px 60px}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.page-head h1{font-size:26px;margin:0;color:var(--primary-dark)}
+.page-head p{margin:4px 0 0;color:var(--ink-soft);font-size:14px}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);padding:10px 12px;border-bottom:1.5px solid var(--line)}
+td{padding:12px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(15,28,24,.55);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
+.modal-head h3{margin:0;font-size:19px}
+.modal-body{padding:22px 24px}
+.close-x{background:none;border:none;font-size:20px;color:var(--ink-faint);padding:4px}
+
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.prod-card{border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;transition:.15s border-color,.15s transform;text-align:left;padding:0}
+.prod-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.prod-card.blocked{opacity:.4;cursor:not-allowed}
+.prod-card.blocked:hover{transform:none;border-color:var(--line)}
+.prod-thumb{width:100%;height:88px;background:var(--primary-soft) center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--primary)}
+.prod-body{padding:9px 10px}
+.prod-name{font-size:13px;font-weight:700;line-height:1.25;margin-bottom:3px}
+.prod-price{font-family:var(--font-mono);font-size:13px;color:var(--primary);font-weight:700}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:#fff;padding:7px 14px;border-radius:99px;font-size:13px;font-weight:700;color:var(--ink-soft)}
+.chip.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+.cart-line{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)}
+.cart-line:last-child{border-bottom:none}
+.qtybtn{width:24px;height:24px;border-radius:6px;border:1.5px solid var(--line);background:#fff;font-weight:800;line-height:1}
+
+.ticket{background:#fff;border-radius:12px;position:relative;border:1.5px solid var(--line)}
+.ticket:before,.ticket:after{content:"";position:absolute;top:50%;transform:translateY(-50%);width:18px;height:18px;background:var(--bg);border-radius:50%;border:1.5px solid var(--line)}
+.ticket:before{left:-10px}.ticket:after{right:-10px}
+
+.empty-state{text-align:center;padding:50px 20px;color:var(--ink-faint)}
+.empty-state .ic{font-size:36px;margin-bottom:10px}
+
+.toast-root{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--primary-dark);color:#fff;padding:13px 18px;border-radius:10px;font-size:13.5px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:slideIn .2s ease-out;max-width:320px}
+.toast.err{background:var(--coral)}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.kpi .v{font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--primary-dark)}
+.kpi .l{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
+
+.child-card{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fff}
+.saldo-big{font-family:var(--font-mono);font-size:30px;font-weight:700;color:var(--primary)}
+.saldo-big.neg{color:var(--coral)}
+
+.thumb-upload{width:84px;height:84px;border-radius:10px;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--bg);cursor:pointer;flex-shrink:0}
+.thumb-upload img{width:100%;height:100%;object-fit:cover}
+
+.checklist{max-height:180px;overflow-y:auto;border:1.5px solid var(--line);border-radius:9px;padding:8px}
+.checklist label{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;text-transform:none;letter-spacing:0;padding:5px 3px;color:var(--ink);cursor:pointer}
+.checklist input{width:auto}
+
+.child-row-form{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--bg)}
+
+@media(max-width:760px){
+  .login-wrap{grid-template-columns:1fr}
+  .login-hero{padding:30px 26px}
+  .nav{display:none}
+  .topbar-inner{height:auto;padding:12px 16px;flex-wrap:wrap;gap:10px}
+}
+
+/* print */
+#printArea{display:none}
+body.printing #app,body.printing .toast-root{display:none !important}
+body.printing #printArea{display:block !important}
+.print-doc{max-width:720px;margin:0 auto;padding:30px;font-family:var(--font-body)}
+.print-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--primary);padding-bottom:14px;margin-bottom:18px}
+.print-head h2{margin:0;font-family:var(--font-display);color:var(--primary-dark)}
+.print-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.print-table th{background:var(--primary-soft);text-align:left;padding:7px 8px;border:1px solid var(--line)}
+.print-table td{padding:6px 8px;border:1px solid var(--line)}
+@media print{
+  @page{margin:16mm}
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:absolute;left:0;top:0;width:100%}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="printArea"></div>
+<div class="toast-root" id="toastRoot"></div>
+
+<script>
+/* ============================================================
+ Kantina Casa da Gilda  —  sistema de cantina escolar
+   Armazenamento: window.storage (dados compartilhados da cantina)
+   ============================================================ */
+
+/* ---------------- storage helpers ---------------- */
+async function dbGet(key, fallback){
+  try{
+    const r = await window.storage.get(key, true);
+    return r ? JSON.parse(r.value) : fallback;
+  }catch(e){ return fallback; }
+}
+async function dbSet(key, value){
+  try{
+    await window.storage.set(key, JSON.stringify(value), true);
+    return true;
+  }catch(e){ console.error('storage error', e); return false; }
+}
+
+let DB = {
+  config: { operatorPassword: '1234' },
+  categories: ['Lanches','Bebidas','Doces','Salgados','Outros'],
+  products: [],
+  students: [],
+  responsaveis: [],
+  transactions: []
+};
+
+async function bootstrap(){
+  DB.config = await dbGet('db:config', { operatorPassword: '1234' });
+  DB.categories = await dbGet('db:categories', ['Lanches','Bebidas','Doces','Salgados','Outros']);
+  DB.products = await dbGet('db:products', []);
+  DB.students = await dbGet('db:students', []);
+  DB.responsaveis = await dbGet('db:responsaveis', []);
+  DB.transactions = await dbGet('db:transactions', []);
+}
+async function persist(part){
+  const map = { config:'db:config', categories:'db:categories', products:'db:products', students:'db:students', responsaveis:'db:responsaveis', transactions:'db:transactions' };
+  await dbSet(map[part], DB[part]);
+}
+
+/* ---------------- utils ---------------- */
+function uid(p){ return p + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayStr(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function fmtMoney(v){ return (v<0?'-':'') + 'R$ ' + Math.abs(v||0).toFixed(2).replace('.',','); }
+function fmtDateBR(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; }
+function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function onlyDigits(s){ return (s||'').replace(/\D/g,''); }
+function fmtCPF(v){ v=onlyDigits(v).slice(0,11); return v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2'); }
+function validCPF(cpf){
+  cpf = onlyDigits(cpf);
+  if(cpf.length!==11 || /^(\d)\1{10}$/.test(cpf)) return false;
+  let sum=0;
+  for(let i=0;i<9;i++) sum += parseInt(cpf[i])*(10-i);
+  let r = (sum*10)%11; if(r===10) r=0;
+  if(r!==parseInt(cpf[9])) return false;
+  sum=0;
+  for(let i=0;i<10;i++) sum += parseInt(cpf[i])*(11-i);
+  r=(sum*10)%11; if(r===10) r=0;
+  return r===parseInt(cpf[10]);
+}
+function nextStudentCode(){
+  let max=0;
+  DB.students.forEach(s=>{ const m=/^AL(\d+)$/.exec(s.codigo||''); if(m) max=Math.max(max,parseInt(m[1])); });
+  return 'AL'+String(max+1).padStart(4,'0');
+}
+function findStudentByCode(code){
+  const term = (code || '').trim().toUpperCase();
+  // Busca pelo código exato ou verifica se o nome contém o texto digitado
+  return DB.students.find(s => 
+    s.codigo.toUpperCase() === term || 
+    s.nome.toUpperCase().includes(term)
+  );
+}
+function studentSpentOnDate(studentId, date){
+  return DB.transactions.filter(t=>t.studentId===studentId && t.tipo==='consumo' && t.data===date).reduce((s,t)=>s+t.valor,0);
+}
+function responsavelNome(cpf){
+  const r = DB.responsaveis.find(r=>r.cpf===cpf);
+  return r ? r.nome : '—';
+}
+function resizeImage(file, maxSize, quality){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w=img.width, h=img.height;
+        if(w>h){ if(w>maxSize){ h=Math.round(h*maxSize/w); w=maxSize; } }
+        else { if(h>maxSize){ w=Math.round(w*maxSize/h); h=maxSize; } }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg', quality||0.72));
+      };
+      img.onerror=reject;
+      img.src=e.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------------- toast ---------------- */
+function toast(msg, isErr){
+  const root=document.getElementById('toastRoot');
+  const el=document.createElement('div');
+  el.className='toast'+(isErr?' err':'');
+  el.textContent=msg;
+  root.appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+
+/* ---------------- state ---------------- */
+let session = null; // {tipo:'operador'} | {tipo:'responsavel', cpf}
+let state = {
+  view:'login',
+  loginTab:'operador',
+  regStep:1,
+  regData:{ nome:'', cpf:'', email:'', senha:'', senha2:'', filhos:[{nome:''}] },
+  operatorView:'pdv',
+  responsavelView:'painel',
+  pdv:{ student:null, date: todayStr(), cart:[], catFilter:'Todas', codeInput:'' },
+  alunosSearch:'',
+  editingProduct:null,
+  editingStudent:null,
+  productModalOpen:false,
+  studentModalOpen:false,
+  newCategoryInput:'',
+  errorMsg:''
+};
+
+function setState(patch){ Object.assign(state, patch); render(); }
+
+/* ---------------- app render root ---------------- */
+function render(){
+  const app=document.getElementById('app');
+  if(!session){
+    app.innerHTML = state.view==='register' ? renderRegister() : renderLogin();
+  } else if(session.tipo==='operador'){
+    app.innerHTML = renderOperatorShell();
+  } else {
+    const resp = DB.responsaveis.find(r=>r.cpf===session.cpf);
+    if(resp && resp.primeiroAcesso){
+      app.innerHTML = renderForceChangePw();
+    } else {
+      app.innerHTML = renderResponsavelShell();
+    }
+  }
+  wireEvents();
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+function renderLogin(){
+  return `
+  <div class="center-screen">
+    <div class="login-wrap">
+      <div class="login-hero">
+        <div>
+          <div class="login-logo">Kantina <span>Casa da Gilda</span></div>
+          <div class="login-tag">Controle de saldo, compras e lançamentos da cantina escolar — com lançamento retroativo e sem cartão físico.</div>
+        </div>
+        <div class="ticket-mini">
+          <div class="t-label">Código do aluno</div>
+          <div class="t-code">AL0027</div>
+          <div class="t-label" style="margin-top:10px">Nenhum cartão necessário — só o código</div>
+        </div>
+      </div>
+      <div class="login-form-side">
+        <div class="tabbar">
+          <button data-loginTab="operador" class="${state.loginTab==='operador'?'active':''}">Operador</button>
+          <button data-loginTab="responsavel" class="${state.loginTab==='responsavel'?'active':''}">Responsável</button>
+        </div>
+        ${state.loginTab==='operador' ? renderOperatorLoginForm() : renderResponsavelLoginForm()}
+        ${state.errorMsg ? `<div class="err mt12">${escapeHtml(state.errorMsg)}</div>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderOperatorLoginForm(){
+  return `
+  <form id="formOperadorLogin">
+    <h2 style="margin:0 0 4px;font-size:20px">Acesso do operador</h2>
+    <p class="muted small mb16">Entre com a senha da cantina para abrir o PDV.</p>
+    <div class="field">
+      <label>Senha do operador</label>
+      <input type="password" name="senha" placeholder="••••" autofocus>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+    <p class="hint mt12">Senha padrão de fábrica: 1234 (altere em Configurações após entrar).</p>
+  </form>`;
+}
+function renderResponsavelLoginForm(){
+  return `
+  <form id="formResponsavelLogin">
+    <h2 style="margin:0 0 4px;font-size:20px">Acesso do responsável</h2>
+    <p class="muted small mb16">Acompanhe saldo, compras e recarregue seus filhos.</p>
+    <div class="field">
+      <label>CPF</label>
+      <input type="text" name="cpf" id="loginCpf" placeholder="000.000.000-00" maxlength="14">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" name="senha" placeholder="••••">
+    </div>
+    <button class="btn btn-primary btn-block" type="submit">Entrar</button>
+    <p class="hint mt12">Ainda não tem conta? <button type="button" class="link-btn" id="goRegister">Cadastre-se e adicione seus filhos</button></p>
+  </form>`;
+}
+
+/* ---------------- registro do responsável ---------------- */
+function renderRegister(){
+  const d = state.regData;
+  return `
+  <div class="center-screen">
+    <div class="card" style="max-width:560px;width:100%">
+      <div class="pad">
+        <div class="row between mb16">
+          <h2 style="margin:0">Cadastro do responsável</h2>
+          <button class="link-btn" id="backToLogin">Voltar ao login</button>
+        </div>
+        <form id="formRegister">
+          <div class="field">
+            <label>Nome completo</label>
+            <input type="text" name="nome" value="${escapeHtml(d.nome)}" placeholder="Seu nome">
+          </div>
+          <div class="row gap12">
+            <div class="field grow">
+              <label>CPF</label>
+              <input type="text" name="cpf" id="regCpf" value="${escapeHtml(d.cpf)}" placeholder="000.000.000-00" maxlength="14">
+            </div>
+            <div class="field grow">
+              <label>E-mail (opcional)</label>
+              <input type="email" name="email" value="${escapeHtml(d.email)}" placeholder="voce@email.com">
+            </div>
+          </div>
+          <div class="row gap12">
+            <div class="field grow">
+              <label>Criar senha</label>
+              <input type="password" name="senha" placeholder="Mínimo 4 caracteres">
+            </div>
+            <div class="field grow">
+              <label>Confirmar senha</label>
+              <input type="password" name="senha2" placeholder="Repita a senha">
+            </div>
+          </div>
+
+          <label class="mt16" style="display:block">Filhos vinculados a esta conta</label>
+          <div id="filhosWrap">
+            ${d.filhos.map((f,i)=>`
+              <div class="child-row-form row gap8">
+                <input type="text" class="grow filhoNome" data-idx="${i}" value="${escapeHtml(f.nome)}" placeholder="Nome do aluno ${i+1}">
+                ${d.filhos.length>1?`<button type="button" class="btn btn-ghost btn-icon removeFilho" data-idx="${i}">✕</button>`:''}
+              </div>`).join('')}
+          </div>
+          <button type="button" class="link-btn" id="addFilho">+ adicionar outro filho</button>
+
+          ${state.errorMsg?`<div class="err mt12">${escapeHtml(state.errorMsg)}</div>`:''}
+          <button class="btn btn-primary btn-block mt20" type="submit">Criar conta</button>
+        </form>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- trocar senha obrigatória (primeiro acesso responsável) ---------------- */
+function renderForceChangePw(){
+  return `
+  <div class="center-screen">
+    <div class="card" style="max-width:420px;width:100%">
+      <div class="pad">
+        <h2 style="margin:0 0 4px">Defina sua nova senha</h2>
+        <p class="muted small mb16">Este é seu primeiro acesso. Por segurança, crie uma senha só sua antes de continuar.</p>
+        <form id="formForcePw">
+          <div class="field"><label>Nova senha</label><input type="password" name="s1" placeholder="Mínimo 4 caracteres"></div>
+          <div class="field"><label>Confirmar nova senha</label><input type="password" name="s2" placeholder="Repita a senha"></div>
+          ${state.errorMsg?`<div class="err mb12">${escapeHtml(state.errorMsg)}</div>`:''}
+          <button class="btn btn-primary btn-block" type="submit">Salvar e entrar</button>
+        </form>
+        <button class="link-btn mt16" id="logoutForce">Sair</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   OPERADOR — shell + views
+   ============================================================ */
+function renderOperatorShell(){
+  const tabs = [
+    ['pdv','PDV / Vendas'],
+    ['recarga','Recarga'],
+    ['alunos','Alunos'],
+    ['produtos','Produtos'],
+    ['categorias','Categorias'],
+    ['relatorios','Relatórios'],
+    ['config','Configurações'],
+  ];
+  return `
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Kantina <span>Casa da Gilda</span></div>
+      <div class="nav">${tabs.map(([k,l])=>`<button data-opview="${k}" class="${state.operatorView===k?'active':''}">${l}</button>`).join('')}</div>
+      <div class="userchip">
+        <div class="avatar">OP</div>
+        <div><div style="font-weight:700">Operador</div></div>
+        <button class="btn btn-ghost btn-sm" id="btnLogout">Sair</button>
+      </div>
+    </div>
+    <div class="nav" style="display:none" id="mobileNavPlaceholder"></div>
+  </div>
+  <select id="mobileNavSelect" style="display:none;margin:10px 16px;width:calc(100% - 32px)">
+    ${tabs.map(([k,l])=>`<option value="${k}" ${state.operatorView===k?'selected':''}>${l}</option>`).join('')}
+  </select>
+  <div class="page">
+    ${ state.operatorView==='pdv' ? renderPDV() :
+       state.operatorView==='recarga' ? renderRecarga() :
+       state.operatorView==='alunos' ? renderAlunos() :
+       state.operatorView==='produtos' ? renderProdutos() :
+       state.operatorView==='categorias' ? renderCategorias() :
+       state.operatorView==='relatorios' ? renderRelatorios() :
+       renderConfig() }
+  </div>
+  ${state.productModalOpen ? renderProductModal() : ''}
+  ${state.studentModalOpen ? renderStudentModal() : ''}
+  `;
+}
+
+/* ---------------- PDV ---------------- */
+function renderPDV(){
+  const p = state.pdv;
+  const s = p.student;
+  const cats = ['Todas', ...DB.categories];
+  const filtered = DB.products.filter(pr=>pr.ativo!==false && (p.catFilter==='Todas' || pr.categoria===p.catFilter));
+  const total = p.cart.reduce((a,c)=>a+c.preco*c.qtd,0);
+  const gastoHoje = s ? studentSpentOnDate(s.id, p.date) : 0;
+
+  return `
+  <div class="page-head">
+    <div>
+      <h1>Ponto de Venda</h1>
+      <p>Lance o consumo do aluno. Você pode escolher a data — inclusive datas passadas.</p>
+    </div>
+  </div>
+
+  <div class="card pad mb20">
+    <div class="row gap12 wrap" style="align-items:flex-end">
+      <div class="field" style="margin:0;min-width:220px">
+  <label>Buscar Aluno (Nome ou Código)</label>
+  <input type="text" id="pdvCode" placeholder="Ex: AL0001 ou Nome do aluno" value="${escapeHtml(p.codeInput)}" class="mono">
+</div>
+<button class="btn btn-primary" id="pdvBuscar">Buscar aluno</button>
+      <div class="field" style="margin:0">
+        <label>Data do lançamento</label>
+        <input type="date" id="pdvDate" value="${p.date}" max="${todayStr()}">
+      </div>
+      ${p.date!==todayStr() ? `<span class="badge badge-amber">Lançamento retroativo</span>` : ''}
+    </div>
+
+    ${s ? `
+      <div class="ticket pad row between wrap gap16 mt16" style="background:var(--primary-soft)">
+        <div>
+          <div class="small faint">ALUNO</div>
+          <div style="font-weight:800;font-size:17px">${escapeHtml(s.nome)}</div>
+          <div class="mono small muted">Código ${s.codigo} · Responsável: ${escapeHtml(responsavelNome(s.cpfResponsavel))}</div>
+        </div>
+        <div>
+          <div class="small faint">SALDO ATUAL</div>
+          <div class="mono" style="font-size:20px;font-weight:800;color:${s.saldo<0?'var(--coral)':'var(--primary)'}">${fmtMoney(s.saldo)}</div>
+        </div>
+        <div>
+          <div class="small faint">GASTO EM ${fmtDateBR(p.date)}</div>
+          <div class="mono" style="font-size:16px;font-weight:700">${fmtMoney(gastoHoje)} ${s.limiteDiario>0?`/ ${fmtMoney(s.limiteDiario)}`:''}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="pdvTrocarAluno">Trocar aluno</button>
+      </div>
+    ` : `<div class="hint mt12">Digite o código do aluno e clique em "Buscar aluno" para começar a venda.</div>`}
+  </div>
+
+  ${s ? `
+  <div class="row gap20 wrap" style="align-items:flex-start">
+    <div class="grow card pad" style="min-width:320px">
+      <div class="chips mb16">
+        ${cats.map(c=>`<button class="chip ${p.catFilter===c?'active':''}" data-catfilter="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}
+      </div>
+      ${filtered.length? `
+      <div class="grid-cards">
+        ${filtered.map(pr=>{
+          const blocked = s.produtosBloqueados && s.produtosBloqueados.includes(pr.id);
+          return `
+          <button class="prod-card ${blocked?'blocked':''}" data-addcart="${pr.id}" ${blocked?'disabled title="Produto bloqueado pelo responsável"':''}>
+            <div class="prod-thumb" style="${pr.foto?`background-image:url('${pr.foto}')`:''}">${pr.foto?'':'🍽️'}</div>
+            <div class="prod-body">
+              <div class="prod-name">${escapeHtml(pr.nome)}</div>
+              <div class="prod-price">${fmtMoney(pr.preco)}</div>
+              ${blocked?`<div class="small" style="color:var(--coral);font-weight:700;margin-top:2px">Bloqueado</div>`:''}
+            </div>
+          </button>`;
+        }).join('')}
+      </div>` : `<div class="empty-state"><div class="ic">📦</div>Nenhum produto nesta categoria.</div>`}
+    </div>
+
+    <div class="card pad" style="width:320px;flex-shrink:0">
+      <h3 style="margin:0 0 12px;font-size:16px">Carrinho</h3>
+      ${p.cart.length? p.cart.map(c=>`
+        <div class="cart-line">
+          <div class="grow">
+            <div style="font-weight:700;font-size:13.5px">${escapeHtml(c.nome)}</div>
+            <div class="mono small muted">${fmtMoney(c.preco)} un.</div>
+          </div>
+          <button class="qtybtn" data-cartqty="${c.produtoId}" data-delta="-1">−</button>
+          <div class="mono" style="width:20px;text-align:center;font-weight:700">${c.qtd}</div>
+          <button class="qtybtn" data-cartqty="${c.produtoId}" data-delta="1">+</button>
+          <button class="btn btn-ghost btn-icon btn-sm" data-cartremove="${c.produtoId}">✕</button>
+        </div>
+      `).join('') : `<div class="empty-state small"><div class="ic">🛒</div>Carrinho vazio</div>`}
+      <div class="row between mt16" style="border-top:2px solid var(--line);padding-top:12px">
+        <div style="font-weight:700">Total</div>
+        <div class="mono" style="font-weight:800;font-size:19px">${fmtMoney(total)}</div>
+      </div>
+      <button class="btn btn-accent btn-block mt16" id="pdvFinalizar" ${!p.cart.length?'disabled':''}>Finalizar venda</button>
+    </div>
+  </div>
+  ` : ''}
+  `;
+}
+
+/* ---------------- Recarga ---------------- */
+function renderRecarga(){
+  return `
+  <div class="page-head">
+    <div><h1>Recarga de saldo</h1><p>Adicione crédito à conta de um aluno. A data também pode ser ajustada.</p></div>
+  </div>
+  <div class="card pad" style="max-width:480px">
+    <form id="formRecarga">
+      <div class="field"><label>Código do aluno</label><input type="text" name="codigo" class="mono" placeholder="Ex: AL0001"></div>
+      <div class="field"><label>Valor da recarga (R$)</label><input type="number" step="0.01" min="0.01" name="valor" placeholder="0,00"></div>
+      <div class="field"><label>Data</label><input type="date" name="data" value="${todayStr()}" max="${todayStr()}"></div>
+      <button class="btn btn-primary btn-block" type="submit">Confirmar recarga</button>
+    </form>
+  </div>
+  `;
+}
+
+/* ---------------- Alunos ---------------- */
+function renderAlunos(){
+  const q = state.alunosSearch.toLowerCase();
+  const list = DB.students.filter(s=> s.nome.toLowerCase().includes(q) || s.codigo.toLowerCase().includes(q));
+  return `
+  <div class="page-head">
+    <div><h1>Alunos</h1><p>Cadastre alunos e gerencie limites, bloqueios e saldo.</p></div>
+    <button class="btn btn-primary" id="btnNovoAluno">+ Novo aluno</button>
+  </div>
+  <div class="field" style="max-width:320px"><input type="search" id="alunoSearch" placeholder="Buscar por nome ou código..." value="${escapeHtml(state.alunosSearch)}"></div>
+  <div class="card mt16">
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Código</th><th>Nome</th><th>Responsável</th><th>Saldo</th><th>Limite/dia</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      ${list.length? list.map(s=>`
+        <tr>
+          <td class="mono">${s.codigo}</td>
+          <td>${escapeHtml(s.nome)}</td>
+          <td class="muted small">${escapeHtml(responsavelNome(s.cpfResponsavel))}</td>
+          <td class="mono" style="color:${s.saldo<0?'var(--coral)':'inherit'};font-weight:700">${fmtMoney(s.saldo)}</td>
+          <td class="mono small">${s.limiteDiario>0?fmtMoney(s.limiteDiario):'—'}</td>
+          <td>${s.ativo!==false?'<span class="badge badge-green">Ativo</span>':'<span class="badge badge-coral">Inativo</span>'}</td>
+          <td class="row gap8">
+            <button class="btn btn-ghost btn-sm" data-editstudent="${s.id}">Editar</button>
+            <button class="btn btn-ghost btn-sm" data-extrato="${s.id}">Extrato PDF</button>
+          </td>
+        </tr>
+      `).join('') : `<tr><td colspan="7"><div class="empty-state"><div class="ic">🎒</div>Nenhum aluno encontrado.</div></td></tr>`}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  `;
+}
+
+/* ---------------- Produtos ---------------- */
+function renderProdutos(){
+  return `
+  <div class="page-head">
+    <div><h1>Produtos</h1><p>Cadastre produtos com foto, organizados por categoria.</p></div>
+    <div class="row gap8">
+      <button class="btn btn-ghost" id="btnExportProdutos">Exportar PDF</button>
+      <button class="btn btn-primary" id="btnNovoProduto">+ Novo produto</button>
+    </div>
+  </div>
+  ${DB.categories.map(cat=>{
+    const items = DB.products.filter(p=>p.categoria===cat);
+    if(!items.length) return '';
+    return `
+    <h3 class="mt24 mb12" style="font-size:16px;color:var(--primary-dark)">${escapeHtml(cat)}</h3>
+    <div class="grid-cards">
+      ${items.map(pr=>`
+        <div class="prod-card" style="cursor:default">
+          <div class="prod-thumb" style="${pr.foto?`background-image:url('${pr.foto}')`:''}">${pr.foto?'':'🍽️'}</div>
+          <div class="prod-body">
+            <div class="prod-name">${escapeHtml(pr.nome)}</div>
+            <div class="prod-price">${fmtMoney(pr.preco)}</div>
+            <div class="row gap8 mt8">
+              <button class="btn btn-ghost btn-sm" data-editproduct="${pr.id}">Editar</button>
+              ${pr.ativo===false?'<span class="badge badge-coral">Inativo</span>':''}
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+  }).join('') || `<div class="empty-state"><div class="ic">🍔</div>Nenhum produto cadastrado ainda.</div>`}
+  `;
+}
+
+/* ---------------- Categorias ---------------- */
+function renderCategorias(){
+  return `
+  <div class="page-head"><div><h1>Categorias</h1><p>Organize o PDV separando os produtos em categorias.</p></div></div>
+  <div class="card pad" style="max-width:480px">
+    <div class="row gap8 mb16">
+      <input type="text" id="novaCategoriaInput" placeholder="Nova categoria (ex: Sorvetes)" value="${escapeHtml(state.newCategoryInput)}">
+      <button class="btn btn-primary" id="btnAddCategoria">Adicionar</button>
+    </div>
+    ${DB.categories.map(c=>{
+      const count = DB.products.filter(p=>p.categoria===c).length;
+      return `<div class="row between" style="padding:10px 0;border-bottom:1px solid var(--line)">
+        <div>${escapeHtml(c)} <span class="faint small">(${count} produto${count!==1?'s':''})</span></div>
+        <button class="btn btn-ghost btn-sm" data-delcat="${escapeHtml(c)}">Remover</button>
+      </div>`;
+    }).join('')}
+  </div>
+  `;
+}
+
+/* ---------------- Relatórios ---------------- */
+function renderRelatorios(){
+  const total = DB.transactions.reduce((a,t)=> a + (t.tipo==='consumo'? t.valor : 0), 0);
+  const totalRecarga = DB.transactions.reduce((a,t)=> a + (t.tipo==='recarga'? t.valor : 0), 0);
+  const hoje = DB.transactions.filter(t=>t.data===todayStr());
+  return `
+  <div class="page-head"><div><h1>Relatórios</h1><p>Visão geral das vendas e recargas.</p></div></div>
+  <div class="grid-cards" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:22px">
+    <div class="kpi"><div class="v">${fmtMoney(total)}</div><div class="l">Total consumido</div></div>
+    <div class="kpi"><div class="v">${fmtMoney(totalRecarga)}</div><div class="l">Total recarregado</div></div>
+    <div class="kpi"><div class="v">${DB.students.length}</div><div class="l">Alunos cadastrados</div></div>
+    <div class="kpi"><div class="v">${hoje.length}</div><div class="l">Lançamentos hoje</div></div>
+  </div>
+  <div class="card">
+    <div class="table-wrap">
+    <table>
+      <thead><tr><th>Data</th><th>Aluno</th><th>Tipo</th><th>Descrição</th><th>Valor</th></tr></thead>
+      <tbody>
+      ${[...DB.transactions].sort((a,b)=> (b.data+b.criadoEm) > (a.data+a.criadoEm)?1:-1).slice(0,60).map(t=>{
+        const s = DB.students.find(s=>s.id===t.studentId);
+        return `<tr>
+          <td class="mono small">${fmtDateBR(t.data)}</td>
+          <td>${s?escapeHtml(s.nome):'—'}</td>
+          <td>${t.tipo==='consumo'?'<span class="badge badge-amber">Consumo</span>':'<span class="badge badge-green">Recarga</span>'}</td>
+          <td class="small muted">${t.tipo==='consumo'?(t.itens||[]).map(i=>i.qtd+'x '+escapeHtml(i.nome)).join(', '):'Recarga de saldo'}</td>
+          <td class="mono" style="font-weight:700">${t.tipo==='consumo'?'-':'+'}${fmtMoney(t.valor)}</td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="5"><div class="empty-state">Nenhum lançamento ainda.</div></td></tr>`}
+      </tbody>
+    </table>
+    </div>
+  </div>
+  `;
+}
+
+/* ---------------- Config (operador) ---------------- */
+function renderConfig(){
+  return `
+  <div class="page-head"><div><h1>Configurações</h1><p>Segurança de acesso do operador.</p></div></div>
+  <div class="card pad" style="max-width:420px">
+    <h3 style="margin-top:0;font-size:16px">Trocar senha do operador</h3>
+    <form id="formTrocarSenhaOperador">
+      <div class="field"><label>Senha atual</label><input type="password" name="atual"></div>
+      <div class="field"><label>Nova senha</label><input type="password" name="nova"></div>
+      <div class="field"><label>Confirmar nova senha</label><input type="password" name="nova2"></div>
+      ${state.errorMsg?`<div class="err mb12">${escapeHtml(state.errorMsg)}</div>`:''}
+      <button class="btn btn-primary btn-block" type="submit">Salvar nova senha</button>
+    </form>
+    <p class="hint mt12">A senha só muda quando você a redefine por aqui — ela não volta sozinha para 1234.</p>
+  </div>
+  `;
+}
+
+/* ---------------- Modal: Produto ---------------- */
+function renderProductModal(){
+  const p = state.editingProduct || { id:null, nome:'', categoria:DB.categories[0]||'Outros', preco:'', foto:'', ativo:true };
+  return `
+  <div class="modal-overlay" id="productModalOverlay">
+    <div class="modal">
+      <div class="modal-head"><h3>${p.id?'Editar produto':'Novo produto'}</h3><button class="close-x" id="closeProductModal">✕</button></div>
+      <div class="modal-body">
+        <form id="formProduct">
+          <div class="row gap16 mb12">
+            <div class="thumb-upload" id="thumbUploadBtn">
+              ${p.foto?`<img src="${p.foto}" id="thumbPreviewImg">`:'📷'}
+            </div>
+            <input type="file" id="fotoInput" accept="image/*" style="display:none">
+            <div class="grow">
+              <div class="field" style="margin-bottom:8px"><label>Nome do produto</label><input type="text" name="nome" value="${escapeHtml(p.nome)}" placeholder="Ex: Coxinha"></div>
+              <div class="row gap8">
+                <div class="field grow" style="margin:0"><label>Preço (R$)</label><input type="number" step="0.01" min="0" name="preco" value="${p.preco}"></div>
+              </div>
+            </div>
+          </div>
+          <div class="field"><label>Categoria</label>
+            <select name="categoria">${DB.categories.map(c=>`<option ${c===p.categoria?'selected':''}>${escapeHtml(c)}</option>`).join('')}</select>
+          </div>
+          <label class="row gap8" style="text-transform:none;font-weight:600;font-size:13.5px;color:var(--ink)"><input type="checkbox" name="ativo" ${p.ativo!==false?'checked':''} style="width:auto"> Produto ativo (aparece no PDV)</label>
+          <div class="row between mt20">
+            ${p.id?`<button type="button" class="btn btn-ghost" id="btnDeleteProduct" style="color:var(--coral)">Excluir</button>`:'<span></span>'}
+            <button class="btn btn-primary" type="submit">Salvar produto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- Modal: Aluno ---------------- */
+function renderStudentModal(){
+  const s = state.editingStudent || { id:null, codigo:nextStudentCode(), nome:'', cpfResponsavel:'', saldo:0, limiteDiario:0, produtosBloqueados:[], ativo:true };
+  return `
+  <div class="modal-overlay" id="studentModalOverlay">
+    <div class="modal">
+      <div class="modal-head"><h3>${s.id?'Editar aluno':'Novo aluno'}</h3><button class="close-x" id="closeStudentModal">✕</button></div>
+      <div class="modal-body">
+        <form id="formStudent">
+          <div class="row gap8">
+            <div class="field grow"><label>Nome do aluno</label><input type="text" name="nome" value="${escapeHtml(s.nome)}"></div>
+            <div class="field" style="width:140px"><label>Código</label><input type="text" name="codigo" class="mono" value="${escapeHtml(s.codigo)}"></div>
+          </div>
+          <div class="field"><label>CPF do responsável (opcional)</label>
+            <select name="cpfResponsavel">
+              <option value="">— sem vínculo —</option>
+              ${DB.responsaveis.map(r=>`<option value="${r.cpf}" ${r.cpf===s.cpfResponsavel?'selected':''}>${escapeHtml(r.nome)} (${fmtCPF(r.cpf)})</option>`).join('')}
+            </select>
+          </div>
+          <div class="row gap8">
+            <div class="field grow"><label>${s.id?'Saldo atual (R$)':'Saldo inicial (R$)'}</label><input type="number" step="0.01" name="saldo" value="${s.saldo}"></div>
+            <div class="field grow"><label>Limite de gasto por dia (R$, 0 = sem limite)</label><input type="number" step="0.01" min="0" name="limiteDiario" value="${s.limiteDiario||0}"></div>
+          </div>
+          <label class="row gap8" style="text-transform:none;font-weight:600;font-size:13.5px;color:var(--ink)"><input type="checkbox" name="ativo" ${s.ativo!==false?'checked':''} style="width:auto"> Aluno ativo</label>
+          <div class="field mt12"><label>Bloquear produtos para este aluno</label>
+            <div class="checklist">
+              ${DB.products.length? DB.products.map(p=>`
+                <label><input type="checkbox" name="bloq" value="${p.id}" ${(s.produtosBloqueados||[]).includes(p.id)?'checked':''}> ${escapeHtml(p.nome)}</label>
+              `).join('') : '<div class="small faint">Nenhum produto cadastrado ainda.</div>'}
+            </div>
+          </div>
+          <div class="row between mt20">
+            ${s.id?`<button type="button" class="btn btn-ghost" id="btnDeleteStudent" style="color:var(--coral)">Excluir aluno</button>`:'<span></span>'}
+            <button class="btn btn-primary" type="submit">Salvar aluno</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================================================
+   RESPONSÁVEL — shell + views
+   ============================================================ */
+function renderResponsavelShell(){
+  const resp = DB.responsaveis.find(r=>r.cpf===session.cpf);
+  const tabs = [['painel','Meus filhos'],['config','Minha conta']];
+  return `
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Lanche<span>Card+</span></div>
+      <div class="nav">${tabs.map(([k,l])=>`<button data-respview="${k}" class="${state.responsavelView===k?'active':''}">${l}</button>`).join('')}</div>
+      <div class="userchip">
+        <div class="avatar">${(resp.nome||'?').slice(0,1).toUpperCase()}</div>
+        <div><div style="font-weight:700">${escapeHtml(resp.nome)}</div></div>
+        <button class="btn btn-ghost btn-sm" id="btnLogout">Sair</button>
+      </div>
+    </div>
+  </div>
+  <select id="mobileNavSelectResp" style="display:none;margin:10px 16px;width:calc(100% - 32px)">
+    ${tabs.map(([k,l])=>`<option value="${k}" ${state.responsavelView===k?'selected':''}>${l}</option>`).join('')}
+  </select>
+  <div class="page">
+    ${state.responsavelView==='painel' ? renderPainelResponsavel(resp) : renderContaResponsavel(resp)}
+  </div>
+  `;
+}
+
+function renderPainelResponsavel(resp){
+  const filhos = DB.students.filter(s=>s.cpfResponsavel===resp.cpf);
+  return `
+  <div class="page-head"><div><h1>Meus filhos</h1><p>Acompanhe saldo, compras e defina limites.</p></div></div>
+  ${filhos.length? `<div class="grid-cards" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+    ${filhos.map(s=>`
+      <div class="child-card">
+        <div class="row between">
+          <div>
+            <div style="font-weight:800;font-size:16px">${escapeHtml(s.nome)}</div>
+            <div class="mono small muted">Código: ${s.codigo}</div>
+          </div>
+          ${s.ativo!==false?'<span class="badge badge-green">Ativo</span>':'<span class="badge badge-coral">Inativo</span>'}
+        </div>
+        <div class="mt16 saldo-big ${s.saldo<0?'neg':''}">${fmtMoney(s.saldo)}</div>
+        <div class="small muted">Limite diário: ${s.limiteDiario>0?fmtMoney(s.limiteDiario):'sem limite'}</div>
+        <div class="row gap8 mt16 wrap">
+          <button class="btn btn-accent btn-sm" data-recarregarfilho="${s.id}">Recarregar saldo</button>
+          <button class="btn btn-ghost btn-sm" data-extratofilho="${s.id}">Extrato PDF</button>
+          <button class="btn btn-ghost btn-sm" data-limitesfilho="${s.id}">Limites e bloqueios</button>
+        </div>
+      </div>
+    `).join('')}
+  </div>` : `<div class="empty-state"><div class="ic">🎒</div>Nenhum filho vinculado à sua conta ainda. Fale com a cantina para vincular um aluno ao seu CPF.</div>`}
+  `;
+}
+
+function renderContaResponsavel(resp){
+  return `
+  <div class="page-head"><div><h1>Minha conta</h1><p>Dados de acesso.</p></div></div>
+  <div class="card pad mb20" style="max-width:420px">
+    <div class="small faint">NOME</div><div class="mb12" style="font-weight:700">${escapeHtml(resp.nome)}</div>
+    <div class="small faint">CPF</div><div class="mb12 mono">${fmtCPF(resp.cpf)}</div>
+    <div class="small faint">E-MAIL</div><div class="mono">${resp.email? escapeHtml(resp.email) : '—'}</div>
+  </div>
+  <div class="card pad" style="max-width:420px">
+    <h3 style="margin-top:0;font-size:16px">Trocar senha</h3>
+    <form id="formTrocarSenhaResp">
+      <div class="field"><label>Senha atual</label><input type="password" name="atual"></div>
+      <div class="field"><label>Nova senha</label><input type="password" name="nova"></div>
+      <div class="field"><label>Confirmar nova senha</label><input type="password" name="nova2"></div>
+      ${state.errorMsg?`<div class="err mb12">${escapeHtml(state.errorMsg)}</div>`:''}
+      <button class="btn btn-primary btn-block" type="submit">Salvar nova senha</button>
+    </form>
+  </div>
+  `;
+}
+
+/* ============================================================
+   PRINT: extrato e lista de produtos
+   ============================================================ */
+function printSection(html){
+  document.getElementById('printArea').innerHTML = html;
+  document.body.classList.add('printing');
+  window.focus();
+  window.print();
+}
+window.addEventListener('afterprint', ()=>{ document.body.classList.remove('printing'); });
+
+function buildExtratoHTML(student){
+  const tx = studentTx(student.id);
+  let saldoCorrido = 0;
+  const rows = [...tx].sort((a,b)=> (a.data+a.criadoEm) > (b.data+b.criadoEm) ? 1 : -1);
+  const withRunning = rows.map(t=>{ saldoCorrido += (t.tipo==='recarga'? t.valor : -t.valor); return {...t, saldoCorrido}; });
+  withRunning.reverse();
+  const totalConsumo = tx.filter(t=>t.tipo==='consumo').reduce((a,t)=>a+t.valor,0);
+  const totalRecarga = tx.filter(t=>t.tipo==='recarga').reduce((a,t)=>a+t.valor,0);
+  return `
+  <div class="print-doc">
+    <div class="print-head">
+      <div>
+        <h2>Extrato — ${escapeHtml(student.nome)}</h2>
+        <div class="small">Código: ${student.codigo} · Responsável: ${escapeHtml(responsavelNome(student.cpfResponsavel))}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:800;font-family:'JetBrains Mono',monospace">Kantina Casa da Gilda</div>
+        <div class="small">Emitido em ${fmtDateBR(todayStr())}</div>
+      </div>
+    </div>
+    <table class="print-table">
+      <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor</th><th>Saldo após</th></tr></thead>
+      <tbody>
+      ${withRunning.length? withRunning.map(t=>`
+        <tr>
+          <td>${fmtDateBR(t.data)}</td>
+          <td>${t.tipo==='consumo'?'Consumo':'Recarga'}</td>
+          <td>${t.tipo==='consumo'?(t.itens||[]).map(i=>i.qtd+'x '+escapeHtml(i.nome)).join(', '):'Recarga de saldo'}</td>
+          <td>${t.tipo==='consumo'?'-':'+'}${fmtMoney(t.valor)}</td>
+          <td>${fmtMoney(t.saldoCorrido)}</td>
+        </tr>`).join('') : `<tr><td colspan="5">Nenhum lançamento registrado.</td></tr>`}
+      </tbody>
+    </table>
+    <p class="small" style="margin-top:16px"><b>Total consumido:</b> ${fmtMoney(totalConsumo)} &nbsp;&nbsp; <b>Total recarregado:</b> ${fmtMoney(totalRecarga)} &nbsp;&nbsp; <b>Saldo atual:</b> ${fmtMoney(student.saldo)}</p>
+    <p class="small faint mt12">Use "Salvar como PDF" na janela de impressão do navegador para gerar o arquivo PDF.</p>
+  </div>`;
+}
+function buildProdutosPDFHTML(){
+  return `
+  <div class="print-doc">
+    <div class="print-head">
+      <h2>Catálogo de produtos</h2>
+      <div style="text-align:right"><div style="font-weight:800;font-family:'JetBrains Mono',monospace">Kantina Casa da Gilda</div><div class="small">Emitido em ${fmtDateBR(todayStr())}</div></div>
+    </div>
+    <table class="print-table">
+      <thead><tr><th>Categoria</th><th>Produto</th><th>Preço</th><th>Status</th></tr></thead>
+      <tbody>
+      ${DB.products.map(p=>`<tr><td>${escapeHtml(p.categoria)}</td><td>${escapeHtml(p.nome)}</td><td>${fmtMoney(p.preco)}</td><td>${p.ativo!==false?'Ativo':'Inativo'}</td></tr>`).join('') || '<tr><td colspan="4">Nenhum produto cadastrado.</td></tr>'}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+/* ============================================================
+   EVENTS
+   ============================================================ */
+function wireEvents(){
+  const app = document.getElementById('app');
+
+  // ---- login tabs ----
+  app.querySelectorAll('[data-loginTab]').forEach(b=>b.onclick=()=>setState({loginTab:b.dataset.logintab, errorMsg:''}));
+  const cpfInput = document.getElementById('loginCpf');
+  if(cpfInput) cpfInput.oninput = ()=>{ cpfInput.value = fmtCPF(cpfInput.value); };
+
+  const formOp = document.getElementById('formOperadorLogin');
+  if(formOp) formOp.onsubmit = e=>{
+    e.preventDefault();
+    const senha = new FormData(formOp).get('senha');
+    if(senha === DB.config.operatorPassword){ session={tipo:'operador'}; setState({view:'app', errorMsg:'', operatorView:'pdv'}); toast('Bem-vindo(a)!'); }
+    else setState({errorMsg:'Senha incorreta.'});
+  };
+  const formResp = document.getElementById('formResponsavelLogin');
+  if(formResp) formResp.onsubmit = e=>{
+    e.preventDefault();
+    const fd = new FormData(formResp);
+    const cpf = onlyDigits(fd.get('cpf'));
+    const senha = fd.get('senha');
+    const r = DB.responsaveis.find(r=>r.cpf===cpf);
+    if(!r){ setState({errorMsg:'CPF não encontrado. Cadastre-se abaixo.'}); return; }
+    if(r.senha !== senha){ setState({errorMsg:'Senha incorreta.'}); return; }
+    session = {tipo:'responsavel', cpf:r.cpf};
+    setState({errorMsg:'', responsavelView:'painel'});
+    toast('Bem-vindo(a), '+r.nome+'!');
+  };
+  const goReg = document.getElementById('goRegister');
+  if(goReg) goReg.onclick = ()=>setState({view:'register', errorMsg:'', regData:{ nome:'', cpf:'', email:'', senha:'', senha2:'', filhos:[{nome:''}] }});
+  const backLogin = document.getElementById('backToLogin');
+  if(backLogin) backLogin.onclick = ()=>setState({view:'login', errorMsg:''});
+
+  // ---- register form ----
+  const regCpf = document.getElementById('regCpf');
+  if(regCpf) regCpf.oninput = ()=>{ regCpf.value = fmtCPF(regCpf.value); };
+  const addFilho = document.getElementById('addFilho');
+  if(addFilho) addFilho.onclick = ()=>{ state.regData.filhos.push({nome:''}); render(); };
+  app.querySelectorAll('.removeFilho').forEach(b=>b.onclick=()=>{ state.regData.filhos.splice(parseInt(b.dataset.idx),1); render(); });
+  app.querySelectorAll('.filhoNome').forEach(inp=>inp.oninput=()=>{ state.regData.filhos[parseInt(inp.dataset.idx)].nome = inp.value; });
+
+  const formRegister = document.getElementById('formRegister');
+  if(formRegister) formRegister.onsubmit = async e=>{
+    e.preventDefault();
+    const fd = new FormData(formRegister);
+    const nome = (fd.get('nome')||'').trim();
+    const cpf = onlyDigits(fd.get('cpf'));
+    const email = (fd.get('email')||'').trim();
+    const senha = fd.get('senha')||'';
+    const senha2 = fd.get('senha2')||'';
+    const filhosNomes = state.regData.filhos.map(f=>f.nome.trim()).filter(Boolean);
+
+    if(!nome){ setState({errorMsg:'Informe seu nome completo.'}); return; }
+    if(!validCPF(cpf)){ setState({errorMsg:'CPF inválido. Confira os números digitados.'}); return; }
+    if(DB.responsaveis.find(r=>r.cpf===cpf)){ setState({errorMsg:'Este CPF já possui cadastro. Faça login.'}); return; }
+    if(senha.length<4){ setState({errorMsg:'A senha deve ter ao menos 4 caracteres.'}); return; }
+    if(senha!==senha2){ setState({errorMsg:'As senhas não conferem.'}); return; }
+    if(!filhosNomes.length){ setState({errorMsg:'Adicione ao menos um aluno.'}); return; }
+
+    DB.responsaveis.push({ cpf, nome, email, senha, primeiroAcesso:false });
+    filhosNomes.forEach(fnome=>{
+      DB.students.push({ id:uid('st_'), codigo:nextStudentCode(), nome:fnome, cpfResponsavel:cpf, saldo:0, limiteDiario:0, produtosBloqueados:[], ativo:true });
+    });
+    await persist('responsaveis'); await persist('students');
+    session = {tipo:'responsavel', cpf};
+    setState({view:'app', errorMsg:'', responsavelView:'painel'});
+    toast('Cadastro criado com sucesso!');
+  };
+
+  // ---- forced password change ----
+  const formForce = document.getElementById('formForcePw');
+  if(formForce) formForce.onsubmit = async e=>{
+    e.preventDefault();
+    const fd = new FormData(formForce);
+    const s1=fd.get('s1'), s2=fd.get('s2');
+    if(s1.length<4){ setState({errorMsg:'Mínimo de 4 caracteres.'}); return; }
+    if(s1!==s2){ setState({errorMsg:'As senhas não conferem.'}); return; }
+    const r = DB.responsaveis.find(r=>r.cpf===session.cpf);
+    r.senha = s1; r.primeiroAcesso = false;
+    await persist('responsaveis');
+    setState({errorMsg:''});
+    toast('Senha atualizada!');
+  };
+  const logoutForce = document.getElementById('logoutForce');
+  if(logoutForce) logoutForce.onclick = ()=>{ session=null; setState({view:'login'}); };
+
+  // ---- logout ----
+  const btnLogout = document.getElementById('btnLogout');
+  if(btnLogout) btnLogout.onclick = ()=>{ session=null; setState({view:'login', errorMsg:''}); };
+
+  // ---- operator nav ----
+  app.querySelectorAll('[data-opview]').forEach(b=>b.onclick=()=>setState({operatorView:b.dataset.opview, errorMsg:''}));
+  const mobileSel = document.getElementById('mobileNavSelect');
+  if(mobileSel){ mobileSel.style.display = window.innerWidth<=760 ? 'block':'none'; mobileSel.onchange=()=>setState({operatorView:mobileSel.value}); }
+  app.querySelectorAll('[data-respview]').forEach(b=>b.onclick=()=>setState({responsavelView:b.dataset.respview, errorMsg:''}));
+  const mobileSelResp = document.getElementById('mobileNavSelectResp');
+  if(mobileSelResp){ mobileSelResp.style.display = window.innerWidth<=760 ? 'block':'none'; mobileSelResp.onchange=()=>setState({responsavelView:mobileSelResp.value}); }
+
+  // ---- PDV ----
+const btnPdvBuscar = document.getElementById('pdvBuscar');
+if(btnPdvBuscar) {
+  btnPdvBuscar.onclick = () => {
+    const input = document.getElementById('pdvCode').value;
+    const aluno = findStudentByCode(input); // Usa a função que alteramos no passo 1
+    
+    if(aluno) {
+      setState({ pdv: { ...state.pdv, student: aluno, codeInput: aluno.codigo } });
+      toast(`Aluno encontrado: ${aluno.nome}`);
+    } else {
+      toast('Aluno não encontrado!', true);
+    }
+  };
+}
+  const pdvBuscar = document.getElementById('pdvBuscar');
+  if(pdvBuscar){
+    const codeEl = document.getElementById('pdvCode');
+    const doSearch = ()=>{
+      const s = findStudentByCode(codeEl.value);
+      if(!s){ toast('Aluno não encontrado para este código.', true); return; }
+      state.pdv.student = s; state.pdv.cart=[]; state.pdv.codeInput=codeEl.value;
+      render();
+    };
+    pdvBuscar.onclick = doSearch;
+    codeEl.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); doSearch(); } };
+    codeEl.oninput = ()=>{ state.pdv.codeInput = codeEl.value; };
+  }
+  const pdvDate = document.getElementById('pdvDate');
+  if(pdvDate) pdvDate.onchange = ()=>{ state.pdv.date = pdvDate.value; render(); };
+  const pdvTrocar = document.getElementById('pdvTrocarAluno');
+  if(pdvTrocar) pdvTrocar.onclick = ()=>{ state.pdv.student=null; state.pdv.cart=[]; state.pdv.codeInput=''; render(); };
+  app.querySelectorAll('[data-catfilter]').forEach(b=>b.onclick=()=>{ state.pdv.catFilter=b.dataset.catfilter; render(); });
+  app.querySelectorAll('[data-addcart]').forEach(b=>b.onclick=()=>{
+    const prodId=b.dataset.addcart; const pr=DB.products.find(p=>p.id===prodId);
+    const s = state.pdv.student;
+    if(s.produtosBloqueados && s.produtosBloqueados.includes(prodId)){ toast('Este produto está bloqueado para o aluno.', true); return; }
+    const existing = state.pdv.cart.find(c=>c.produtoId===prodId);
+    if(existing) existing.qtd++;
+    else state.pdv.cart.push({produtoId:prodId, nome:pr.nome, preco:pr.preco, qtd:1});
+    render();
+  });
+  app.querySelectorAll('[data-cartqty]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.cartqty, delta=parseInt(b.dataset.delta);
+    const line = state.pdv.cart.find(c=>c.produtoId===id);
+    line.qtd += delta;
+    if(line.qtd<=0) state.pdv.cart = state.pdv.cart.filter(c=>c.produtoId!==id);
+    render();
+  });
+  app.querySelectorAll('[data-cartremove]').forEach(b=>b.onclick=()=>{
+    state.pdv.cart = state.pdv.cart.filter(c=>c.produtoId!==b.dataset.cartremove); render();
+  });
+  const pdvFinalizar = document.getElementById('pdvFinalizar');
+  if(pdvFinalizar) pdvFinalizar.onclick = async ()=>{
+    const s = state.pdv.student;
+    const total = state.pdv.cart.reduce((a,c)=>a+c.preco*c.qtd,0);
+    if(s.limiteDiario>0){
+      const jaGasto = studentSpentOnDate(s.id, state.pdv.date);
+      if(jaGasto+total > s.limiteDiario){
+        const ok = confirm('Este lançamento ultrapassa o limite diário definido pelo responsável ('+fmtMoney(s.limiteDiario)+'). Deseja continuar mesmo assim?');
+        if(!ok) return;
+      }
+    }
+    const tx = { id:uid('tx_'), studentId:s.id, tipo:'consumo', data:state.pdv.date, criadoEm:new Date().toISOString(), itens: state.pdv.cart.map(c=>({produtoId:c.produtoId,nome:c.nome,preco:c.preco,qtd:c.qtd})), valor: total, operador:'operador' };
+    DB.transactions.push(tx);
+    s.saldo -= total;
+    await persist('transactions'); await persist('students');
+    toast('Venda lançada em '+fmtDateBR(state.pdv.date)+'!');
+    state.pdv.cart=[]; state.pdv.student=null; state.pdv.codeInput='';
+    render();
+  };
+
+  // ---- Recarga ----
+  const formRecarga = document.getElementById('formRecarga');
+  if(formRecarga) formRecarga.onsubmit = async e=>{
+    e.preventDefault();
+    const fd = new FormData(formRecarga);
+    const s = findStudentByCode(fd.get('codigo'));
+    if(!s){ toast('Aluno não encontrado.', true); return; }
+    const valor = parseFloat(fd.get('valor'));
+    if(!valor || valor<=0){ toast('Informe um valor válido.', true); return; }
+    const data = fd.get('data') || todayStr();
+    DB.transactions.push({ id:uid('tx_'), studentId:s.id, tipo:'recarga', data, criadoEm:new Date().toISOString(), valor, operador:'operador' });
+    s.saldo += valor;
+    await persist('transactions'); await persist('students');
+    toast('Recarga de '+fmtMoney(valor)+' lançada para '+s.nome+'.');
+    formRecarga.reset();
+  };
+
+  // ---- Alunos ----
+  const btnNovoAluno = document.getElementById('btnNovoAluno');
+  if(btnNovoAluno) btnNovoAluno.onclick = ()=>{ state.editingStudent=null; state.studentModalOpen=true; render(); };
+  const alunoSearch = document.getElementById('alunoSearch');
+  if(alunoSearch) alunoSearch.oninput = ()=>{ state.alunosSearch = alunoSearch.value; render(); };
+  app.querySelectorAll('[data-editstudent]').forEach(b=>b.onclick=()=>{
+    state.editingStudent = JSON.parse(JSON.stringify(DB.students.find(s=>s.id===b.dataset.editstudent)));
+    state.studentModalOpen = true; render();
+  });
+  app.querySelectorAll('[data-extrato]').forEach(b=>b.onclick=()=>{
+    const s = DB.students.find(s=>s.id===b.dataset.extrato);
+    printSection(buildExtratoHTML(s));
+  });
+
+  // ---- Produtos ----
+  const btnNovoProduto = document.getElementById('btnNovoProduto');
+  if(btnNovoProduto) btnNovoProduto.onclick = ()=>{ state.editingProduct=null; state.productModalOpen=true; render(); };
+  const btnExportProdutos = document.getElementById('btnExportProdutos');
+  if(btnExportProdutos) btnExportProdutos.onclick = ()=>printSection(buildProdutosPDFHTML());
+  app.querySelectorAll('[data-editproduct]').forEach(b=>b.onclick=()=>{
+    state.editingProduct = JSON.parse(JSON.stringify(DB.products.find(p=>p.id===b.dataset.editproduct)));
+    state.productModalOpen = true; render();
+  });
+
+  // ---- Categorias ----
+  const catInput = document.getElementById('novaCategoriaInput');
+  if(catInput) catInput.oninput = ()=>{ state.newCategoryInput = catInput.value; };
+  const btnAddCategoria = document.getElementById('btnAddCategoria');
+  if(btnAddCategoria) btnAddCategoria.onclick = async ()=>{
+    const name = (state.newCategoryInput||'').trim();
+    if(!name){ toast('Digite um nome de categoria.', true); return; }
+    if(DB.categories.some(c=>c.toLowerCase()===name.toLowerCase())){ toast('Essa categoria já existe.', true); return; }
+    DB.categories.push(name);
+    await persist('categories');
+    state.newCategoryInput='';
+    toast('Categoria adicionada!');
+    render();
+  };
+  app.querySelectorAll('[data-delcat]').forEach(b=>b.onclick=async ()=>{
+    const cat = b.dataset.delcat;
+    if(DB.categories.length<=1){ toast('Mantenha ao menos uma categoria.', true); return; }
+    if(!confirm('Remover a categoria "'+cat+'"? Produtos nela passarão para "Outros".')) return;
+    DB.products.forEach(p=>{ if(p.categoria===cat) p.categoria = DB.categories.find(c=>c!==cat) || 'Outros'; });
+    DB.categories = DB.categories.filter(c=>c!==cat);
+    await persist('categories'); await persist('products');
+    render();
+  });
+
+  // ---- Config operador ----
+  const formTrocarOp = document.getElementById('formTrocarSenhaOperador');
+  if(formTrocarOp) formTrocarOp.onsubmit = async e=>{
+    e.preventDefault();
+    const fd = new FormData(formTrocarOp);
+    const atual=fd.get('atual'), nova=fd.get('nova'), nova2=fd.get('nova2');
+    if(atual !== DB.config.operatorPassword){ setState({errorMsg:'Senha atual incorreta.'}); return; }
+    if(nova.length<4){ setState({errorMsg:'A nova senha deve ter ao menos 4 caracteres.'}); return; }
+    if(nova!==nova2){ setState({errorMsg:'As senhas não conferem.'}); return; }
+    DB.config.operatorPassword = nova;
+    await persist('config');
+    setState({errorMsg:''});
+    toast('Senha do operador atualizada com sucesso — ela permanece assim até você trocar novamente.');
+  };
+
+  // ---- Config responsável ----
+  const formTrocarResp = document.getElementById('formTrocarSenhaResp');
+  if(formTrocarResp) formTrocarResp.onsubmit = async e=>{
+    e.preventDefault();
+    const fd = new FormData(formTrocarResp);
+    const atual=fd.get('atual'), nova=fd.get('nova'), nova2=fd.get('nova2');
+    const r = DB.responsaveis.find(r=>r.cpf===session.cpf);
+    if(atual !== r.senha){ setState({errorMsg:'Senha atual incorreta.'}); return; }
+    if(nova.length<4){ setState({errorMsg:'A nova senha deve ter ao menos 4 caracteres.'}); return; }
+    if(nova!==nova2){ setState({errorMsg:'As senhas não conferem.'}); return; }
+    r.senha = nova;
+    await persist('responsaveis');
+    setState({errorMsg:''});
+    toast('Senha atualizada!');
+  };
+
+  // ---- Responsável: painel actions ----
+  app.querySelectorAll('[data-extratofilho]').forEach(b=>b.onclick=()=>{
+    const s = DB.students.find(s=>s.id===b.dataset.extratofilho);
+    printSection(buildExtratoHTML(s));
+  });
+  app.querySelectorAll('[data-recarregarfilho]').forEach(b=>b.onclick=async ()=>{
+    const s = DB.students.find(s=>s.id===b.dataset.recarregarfilho);
+    const val = prompt('Valor da recarga para '+s.nome+' (R$) — recarga simulada, sem gateway de pagamento real:');
+    if(val===null) return;
+    const valor = parseFloat(val.replace(',','.'));
+    if(!valor || valor<=0){ toast('Valor inválido.', true); return; }
+    DB.transactions.push({ id:uid('tx_'), studentId:s.id, tipo:'recarga', data:todayStr(), criadoEm:new Date().toISOString(), valor, operador:session.cpf });
+    s.saldo += valor;
+    await persist('transactions'); await persist('students');
+    toast('Recarga de '+fmtMoney(valor)+' realizada!');
+    render();
+  });
+  app.querySelectorAll('[data-limitesfilho]').forEach(b=>b.onclick=()=>{
+    state.editingStudent = JSON.parse(JSON.stringify(DB.students.find(s=>s.id===b.dataset.limitesfilho)));
+    state.studentModalOpen = true; render();
+  });
+
+  // ---- Product modal ----
+  const overlayProd = document.getElementById('productModalOverlay');
+  if(overlayProd){
+    overlayProd.addEventListener('click', e=>{ if(e.target===overlayProd){ state.productModalOpen=false; render(); } });
+    document.getElementById('closeProductModal').onclick = ()=>{ state.productModalOpen=false; render(); };
+    const thumbBtn = document.getElementById('thumbUploadBtn');
+    const fotoInput = document.getElementById('fotoInput');
+    thumbBtn.onclick = ()=>fotoInput.click();
+    fotoInput.onchange = async ()=>{
+      if(!fotoInput.files[0]) return;
+      const dataUrl = await resizeImage(fotoInput.files[0], 400, 0.72);
+      thumbBtn.innerHTML = `<img src="${dataUrl}" id="thumbPreviewImg">`;
+      thumbBtn.dataset.foto = dataUrl;
+    };
+    const formProduct = document.getElementById('formProduct');
+    formProduct.onsubmit = async e=>{
+      e.preventDefault();
+      const fd = new FormData(formProduct);
+      const nome = (fd.get('nome')||'').trim();
+      const preco = parseFloat(fd.get('preco'));
+      if(!nome){ toast('Informe o nome do produto.', true); return; }
+      if(isNaN(preco) || preco<0){ toast('Informe um preço válido.', true); return; }
+      const foto = thumbBtn.dataset.foto || (state.editingProduct? state.editingProduct.foto : '') || '';
+      if(state.editingProduct){
+        const p = DB.products.find(p=>p.id===state.editingProduct.id);
+        p.nome=nome; p.preco=preco; p.categoria=fd.get('categoria'); p.foto=foto; p.ativo = fd.get('ativo')==='on';
+      } else {
+        DB.products.push({ id:uid('pr_'), nome, preco, categoria:fd.get('categoria'), foto, ativo: fd.get('ativo')==='on' });
+      }
+      await persist('products');
+      state.productModalOpen=false; toast('Produto salvo!'); render();
+    };
+    const delBtn = document.getElementById('btnDeleteProduct');
+    if(delBtn) delBtn.onclick = async ()=>{
+      if(!confirm('Excluir este produto?')) return;
+      DB.products = DB.products.filter(p=>p.id!==state.editingProduct.id);
+      await persist('products');
+      state.productModalOpen=false; toast('Produto excluído.'); render();
+    };
+  }
+
+  // ---- Student modal ----
+  const overlayStud = document.getElementById('studentModalOverlay');
+  if(overlayStud){
+    overlayStud.addEventListener('click', e=>{ if(e.target===overlayStud){ state.studentModalOpen=false; render(); } });
+    document.getElementById('closeStudentModal').onclick = ()=>{ state.studentModalOpen=false; render(); };
+    const formStudent = document.getElementById('formStudent');
+    formStudent.onsubmit = async e=>{
+      e.preventDefault();
+      const fd = new FormData(formStudent);
+      const nome=(fd.get('nome')||'').trim();
+      const codigo=(fd.get('codigo')||'').trim().toUpperCase();
+      if(!nome){ toast('Informe o nome do aluno.', true); return; }
+      if(!codigo){ toast('Informe um código para o aluno.', true); return; }
+      const dupCode = DB.students.find(s=>s.codigo.toUpperCase()===codigo && (!state.editingStudent || s.id!==state.editingStudent.id));
+      if(dupCode){ toast('Já existe um aluno com esse código.', true); return; }
+      const bloq = Array.from(formStudent.querySelectorAll('input[name=bloq]:checked')).map(i=>i.value);
+      const payload = {
+        nome, codigo,
+        cpfResponsavel: fd.get('cpfResponsavel')||'',
+        saldo: parseFloat(fd.get('saldo'))||0,
+        limiteDiario: parseFloat(fd.get('limiteDiario'))||0,
+        produtosBloqueados: bloq,
+        ativo: fd.get('ativo')==='on'
+      };
+      if(state.editingStudent){
+        Object.assign(DB.students.find(s=>s.id===state.editingStudent.id), payload);
+      } else {
+        DB.students.push({ id:uid('st_'), ...payload });
+      }
+      await persist('students');
+      state.studentModalOpen=false; toast('Aluno salvo!'); render();
+    };
+    const delStud = document.getElementById('btnDeleteStudent');
+    if(delStud) delStud.onclick = async ()=>{
+      if(!confirm('Excluir este aluno? Os lançamentos antigos serão mantidos no histórico.')) return;
+      DB.students = DB.students.filter(s=>s.id!==state.editingStudent.id);
+      await persist('students');
+      state.studentModalOpen=false; toast('Aluno excluído.'); render();
+    };
+  }
+}
+
+/* ---------------- init ---------------- */
+(async function init(){
+  document.getElementById('app').innerHTML = '<div class="center-screen"><div class="muted">Carregando Kantina Casa da Gilda...</div></div>';
+  await bootstrap();
+  render();
+})();
+</script>
+</body>
+</html>
