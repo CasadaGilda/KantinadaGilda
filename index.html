@@ -579,12 +579,14 @@ function renderPDV(){
   <input type="text" id="pdvCode" placeholder="Ex: AL0001 ou Nome do aluno" value="${escapeHtml(p.codeInput)}" class="mono">
 </div>
 <button class="btn btn-primary" id="pdvBuscar">Buscar aluno</button>
-      <div class="field" style="margin:0">
-        <label>Data do lançamento</label>
-        <input type="date" id="pdvDate" value="${p.date}" max="${todayStr()}">
-      </div>
-      ${p.date!==todayStr() ? `<span class="badge badge-amber">Lançamento retroativo</span>` : ''}
-    </div>
+      <div class="field" style="margin:0;min-width:220px">
+  <label>Buscar Aluno (Nome ou Código)</label>
+  <input type="text" id="pdvSearch" placeholder="Ex: AL0001 ou Nome do aluno" 
+         value="${escapeHtml(p.alunosSearch || '')}" 
+         oninput="state.pdv.alunosSearch = this.value" 
+         class="mono">
+</div>
+<button class="btn btn-primary" id="pdvBuscar">Buscar aluno</button>
 
     ${s ? `
       <div class="ticket pad row between wrap gap16 mt16" style="background:var(--primary-soft)">
